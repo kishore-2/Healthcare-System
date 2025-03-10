@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sub-Center Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Sub-Center Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="phc_subcenter_dashboard.html">PHC/Sub-Center Dashboard</a></li>
+                <li><a href="doctor_attendance_form.html">Submit Attendance</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Resource Requests</h2>
+            <table id="resource-requests-table">
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Quantity</th>
+                        <th>Requester</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Resource requests will be populated here -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 Healthcare Management System</p>
+    </footer>
+    <script>
+        async function fetchResourceRequests() {
+            const response = await fetch('/api/getResourceRequests');
+            const data = await response.json();
+            const tableBody = document.getElementById('resource-requests-table').getElementsByTagName('tbody')[0];
+
+            data.forEach(request => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).innerText = request.item_name;
+                row.insertCell(1).innerText = request.quantity;
+                row.insertCell(2).innerText = request.requester;
+                row.insertCell(3).innerText = request.status;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchResourceRequests);
+    </script>
+</body>
+</html>

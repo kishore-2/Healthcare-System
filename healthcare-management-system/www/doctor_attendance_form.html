@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Attendance Form</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Submit Attendance</h1>
+        <form id="attendanceForm">
+            <label for="doctor_id">Doctor ID:</label>
+            <input type="text" id="doctor_id" name="doctor_id" required>
+
+            <label for="doctor_name">Doctor Name:</label>
+            <input type="text" id="doctor_name" name="doctor_name" required>
+
+            <label for="status">Status:</label>
+            <select id="status" name="status" required>
+                <option value="P">Present</option>
+                <option value="AB">Absent with Leave</option>
+                <option value="A">Absent</option>
+            </select>
+
+            <button type="submit">Submit Attendance</button>
+        </form>
+        <div id="responseMessage"></div>
+    </div>
+
+    <script>
+        document.getElementById('attendanceForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/submitAttendance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+                document.getElementById('responseMessage').innerText = result.message || 'Attendance submitted successfully!';
+            } catch (error) {
+                document.getElementById('responseMessage').innerText = 'Error submitting attendance: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>

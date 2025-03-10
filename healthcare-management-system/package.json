@@ -1,0 +1,21 @@
+{
+  "name": "healthcare-management-system",
+  "version": "1.0.0",
+  "description": "A cloud-based healthcare management system using Azure Functions and a static frontend.",
+  "main": "index.js",
+  "scripts": {
+    "start": "func start",
+    "build": "echo 'No build step required'",
+    "test": "echo 'No tests specified'"
+  },
+  "dependencies": {
+    "mssql": "^7.1.0"
+  },
+  "devDependencies": {
+    "@azure/functions": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "license": "MIT"
+}
