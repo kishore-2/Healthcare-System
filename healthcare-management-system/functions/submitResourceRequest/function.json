@@ -1,24 +1,17 @@
 {
   "bindings": [
-    {
-      "authLevel": "function",
-      "type": "httpTrigger",
-      "direction": "in",
-      "name": "req",
-      "methods": ["post"],
-      "route": "submitResourceRequest"
-    },
-    {
-      "type": "http",
-      "direction": "out",
-      "name": "res"
-    },
-    {
-      "type": "sql",
-      "direction": "out",
-      "connectionStringSetting": "AzureSqlConnection",
-      "commandText": "INSERT INTO ResourceRequests (item_name, quantity, requester) VALUES (@item_name, @quantity, @requester)"
-    }
-  ],
-  "disabled": false
+      {
+          "authLevel": "function",
+          "type": "httpTrigger",
+          "direction": "in",
+          "name": "req",
+          "methods": ["post"],
+          "route": "submitResourceRequest"
+      },
+      {
+          "type": "http",
+          "direction": "out",
+          "name": "res"
+      }
+  ]
 }

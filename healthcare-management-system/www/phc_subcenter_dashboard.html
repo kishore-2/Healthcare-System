@@ -4,84 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PHC/Sub-Center Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>PHC/Sub-Center Dashboard</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="doctor_attendance_form.html">Submit Attendance</a></li>
-                <li><a href="subcenter_dashboard.html">View Resource Requests</a></li>
-            </ul>
-        </nav>
-    </header>
-    
-    <main>
-        <section>
-            <h2>Submit Attendance</h2>
-            <form id="attendanceForm">
-                <label for="doctor_id">Doctor ID:</label>
-                <input type="text" id="doctor_id" name="doctor_id" required>
-                
-                <label for="doctor_name">Doctor Name:</label>
-                <input type="text" id="doctor_name" name="doctor_name" required>
-                
-                <label for="status">Status:</label>
-                <select id="status" name="status" required>
-                    <option value="P">Present</option>
-                    <option value="AB">Absent with Leave</option>
-                    <option value="A">Absent</option>
-                </select>
-                
-                <button type="submit">Submit Attendance</button>
-            </form>
-        </section>
-
-        <section>
-            <h2>Resource Requests</h2>
-            <form id="resourceRequestForm">
-                <label for="item_name">Item Name:</label>
-                <input type="text" id="item_name" name="item_name" required>
-                
-                <label for="quantity">Quantity:</label>
-                <input type="number" id="quantity" name="quantity" required>
-                
-                <label for="requester">Requester:</label>
-                <input type="text" id="requester" name="requester" required>
-                
-                <button type="submit">Submit Resource Request</button>
-            </form>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2023 Healthcare Management System</p>
-    </footer>
-
-    <script>
-        document.getElementById('attendanceForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(this);
-            fetch('/api/submitAttendance', {
-                method: 'POST',
-                body: formData
-            }).then(response => response.json())
-              .then(data => alert(data.message))
-              .catch(error => console.error('Error:', error));
-        });
-
-        document.getElementById('resourceRequestForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(this);
-            fetch('/api/submitResourceRequest', {
-                method: 'POST',
-                body: formData
-            }).then(response => response.json())
-              .then(data => alert(data.message))
-              .catch(error => console.error('Error:', error));
-        });
-    </script>
+    <h1>PHC/Sub-Center Dashboard</h1>
+    <div>
+        <h2>Submit Attendance</h2>
+        <form action="/submitAttendance" method="post">
+            <label for="doctor_id">Doctor ID:</label>
+            <input type="text" id="doctor_id" name="doctor_id">
+            <br>
+            <label for="doctor_name">Doctor Name:</label>
+            <input type="text" id="doctor_name" name="doctor_name">
+            <br>
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option value="P">Present</option>
+                <option value="AB">Absent</option>
+                <option value="A">Available</option>
+            </select>
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div>
+        <h2>Submit Resource Request</h2>
+        <form action="/submitResourceRequest" method="post">
+            <label for="item_name">Item Name:</label>
+            <input type="text" id="item_name" name="item_name">
+            <br>
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity">
+            <br>
+            <label for="requester">Requester:</label>
+            <input type="text" id="requester" name="requester">
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 </body>
 </html>

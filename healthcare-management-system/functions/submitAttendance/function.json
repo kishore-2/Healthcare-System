@@ -1,24 +1,17 @@
 {
   "bindings": [
-    {
-      "authLevel": "function",
-      "type": "httpTrigger",
-      "direction": "in",
-      "name": "req",
-      "methods": ["post"],
-      "route": "submitAttendance"
-    },
-    {
-      "type": "http",
-      "direction": "out",
-      "name": "res"
-    },
-    {
-      "type": "sql",
-      "direction": "out",
-      "connectionStringSetting": "AzureSqlConnection",
-      "commandText": "INSERT INTO DoctorAttendance (doctor_id, doctor_name, status) VALUES (@doctor_id, @doctor_name, @status)"
-    }
-  ],
-  "disabled": false
+      {
+          "authLevel": "function",
+          "type": "httpTrigger",
+          "direction": "in",
+          "name": "req",
+          "methods": ["post"],
+          "route": "submitAttendance"
+      },
+      {
+          "type": "http",
+          "direction": "out",
+          "name": "res"
+      }
+  ]
 }
