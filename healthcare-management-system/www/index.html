@@ -11,16 +11,23 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            const response = await fetch('/api/authenticate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password, role })
-            });
+            try {
+                const response = await fetch('/api/authenticate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password, role })
+                });
 
-            const result = await response.json();
-            if (response.ok) {
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    alert('Login failed: ' + errorText);
+                    return;
+                }
+
+                const result = await response.json();
                 if (role === 'DDHS') {
                     window.location.href = 'ddhs_dashboard.html';
                 } else if (role === 'PHC') {
@@ -28,8 +35,9 @@
                 } else if (role === 'Sub-Center') {
                     window.location.href = 'subcenter_dashboard.html';
                 }
-            } else {
-                alert(result.message);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
             }
         }
     </script>
@@ -48,7 +56,7 @@
         <input type="text" id="username" name="username">
         <br>
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password">
+        <input type="password" id="password" name="password" autocomplete="current-password">
         <br>
         <button type="submit">Login</button>
     </form>

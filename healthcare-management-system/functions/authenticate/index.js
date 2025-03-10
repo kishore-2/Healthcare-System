@@ -40,6 +40,7 @@ module.exports = async function (context, req) {
             body: { message: "Authentication successful." }
         };
     } catch (err) {
+        context.log.error('Error authenticating user:', err);
         context.res = {
             status: 500,
             body: { message: "Error authenticating user: " + err.message }
