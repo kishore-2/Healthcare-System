@@ -4,10 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Healthcare Management System</title>
+    <script>
+        async function login(event) {
+            event.preventDefault();
+            const role = document.getElementById('role').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('/api/authenticate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password, role })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                if (role === 'DDHS') {
+                    window.location.href = 'ddhs_dashboard.html';
+                } else if (role === 'PHC') {
+                    window.location.href = 'phc_subcenter_dashboard.html';
+                } else if (role === 'Sub-Center') {
+                    window.location.href = 'subcenter_dashboard.html';
+                }
+            } else {
+                alert(result.message);
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Login</h1>
-    <form action="/login" method="post">
+    <form onsubmit="login(event)">
         <label for="role">Role:</label>
         <select id="role" name="role">
             <option value="DDHS">DDHS</option>

@@ -7,7 +7,7 @@ module.exports = async function (context, req) {
     if (!username || !password || !role) {
         context.res = {
             status: 400,
-            body: "Please provide username, password, and role."
+            body: { message: "Please provide username, password, and role." }
         };
         return;
     }
@@ -19,7 +19,7 @@ module.exports = async function (context, req) {
         if (result.recordset.length === 0) {
             context.res = {
                 status: 401,
-                body: "Invalid credentials."
+                body: { message: "Invalid credentials." }
             };
             return;
         }
@@ -30,19 +30,19 @@ module.exports = async function (context, req) {
         if (!passwordMatch) {
             context.res = {
                 status: 401,
-                body: "Invalid credentials."
+                body: { message: "Invalid credentials." }
             };
             return;
         }
 
         context.res = {
             status: 200,
-            body: "Authentication successful."
+            body: { message: "Authentication successful." }
         };
     } catch (err) {
         context.res = {
             status: 500,
-            body: "Error authenticating user: " + err.message
+            body: { message: "Error authenticating user: " + err.message }
         };
     }
 };

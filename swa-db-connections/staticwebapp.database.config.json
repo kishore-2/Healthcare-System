@@ -1,0 +1,73 @@
+{
+  "$schema": "https://github.com/Azure/data-api-builder/releases/download/v1.3.19/dab.draft.schema.json",
+  "data-source": {
+    "database-type": "mssql",
+    "connection-string": "Server=tcp:healthcareserver.database.windows.net,1433;Initial Catalog=HealthcareDB;Persist Security Info=False;User ID=kishore;Password=Shin$08chan;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+    "options": {
+      "set-session-context": false
+    }
+  },
+  "runtime": {
+    "rest": {
+      "enabled": true,
+      "path": "/rest",
+      "request-body-strict": true
+    },
+    "graphql": {
+      "enabled": true,
+      "path": "/graphql",
+      "allow-introspection": true
+    },
+    "host": {
+      "cors": {
+        "origins": ["*"],
+        "allow-credentials": false
+      },
+      "authentication": {
+        "provider": "StaticWebApps"
+      },
+      "mode": "production"
+    }
+  },
+  "entities": {
+    "Users": {
+      "source": "Users",
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        },
+        {
+          "role": "authenticated",
+          "actions": ["create", "read", "update", "delete"]
+        }
+      ]
+    },
+    "DoctorAttendance": {
+      "source": "DoctorAttendance",
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        },
+        {
+          "role": "authenticated",
+          "actions": ["create", "read", "update", "delete"]
+        }
+      ]
+    },
+    "ResourceRequests": {
+      "source": "ResourceRequests",
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        },
+        {
+          "role": "authenticated",
+          "actions": ["create", "read", "update", "delete"]
+        }
+      ]
+    }
+  }
+}
