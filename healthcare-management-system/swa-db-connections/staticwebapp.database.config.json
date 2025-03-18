@@ -68,6 +68,19 @@
           "actions": ["create", "read", "update", "delete"]
         }
       ]
+    },
+    "Inventory": {
+      "source": "Inventory",
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        },
+        {
+          "role": "authenticated",
+          "actions": ["create", "read", "update", "delete"]
+        }
+      ]
     }
   }
 }

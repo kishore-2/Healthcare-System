@@ -1,28 +1,29 @@
+require('dotenv').config();
 const sql = require('mssql');
 
 module.exports = async function (context, req) {
-    const { item_name, quantity, requester } = req.body;
+    const { itemName, quantity } = req.body;
 
-    if (!item_name || !quantity || !requester) {
+    if (!itemName || !quantity) {
         context.res = {
             status: 400,
-            body: "Please provide item_name, quantity, and requester."
+            body: { message: "Please provide itemName and quantity." }
         };
         return;
     }
 
     try {
         await sql.connect(process.env.AzureSqlConnection);
-        await sql.query`INSERT INTO ResourceRequests (ItemName, Quantity, Requester) VALUES (${item_name}, ${quantity}, ${requester})`;
+        await sql.query`INSERT INTO ResourceRequests (item_name, quantity, requester) VALUES (${itemName}, ${quantity}, 'PHC')`;
 
         context.res = {
             status: 200,
-            body: "Resource request submitted successfully."
+            body: { message: "Resource request submitted successfully." }
         };
     } catch (err) {
         context.res = {
             status: 500,
-            body: "Error submitting resource request: " + err.message
+            body: { message: "Error submitting resource request: " + err.message }
         };
     }
 };

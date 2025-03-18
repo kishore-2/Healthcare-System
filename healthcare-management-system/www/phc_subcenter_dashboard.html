@@ -4,42 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PHC/Sub-Center Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        button {
+            padding: 8px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .request { background-color: #28a745; color: white; }
+        .request:hover { background-color: #218838; }
+        .nav { margin-bottom: 20px; }
+        .nav a {
+            margin-right: 15px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .nav a:hover { background-color: #0056b3; }
+    </style>
 </head>
 <body>
-    <h1>PHC/Sub-Center Dashboard</h1>
-    <div>
-        <h2>Submit Attendance</h2>
-        <form action="/submitAttendance" method="post">
-            <label for="doctor_id">Doctor ID:</label>
-            <input type="text" id="doctor_id" name="doctor_id">
-            <br>
-            <label for="doctor_name">Doctor Name:</label>
-            <input type="text" id="doctor_name" name="doctor_name">
-            <br>
-            <label for="status">Status:</label>
-            <select id="status" name="status">
-                <option value="P">Present</option>
-                <option value="AB">Absent</option>
-                <option value="A">Available</option>
-            </select>
-            <br>
-            <button type="submit">Submit</button>
-        </form>
+    <div class="container">
+        <h2>PHC/Sub-Center Dashboard</h2>
+        
+        <div class="nav">
+            <a href="doctor_attendance_form.html">Submit Attendance</a>
+            <a href="index.html">Logout</a>
+        </div>
+        
+        <h3>Resource Inventory</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody id="inventoryTable"></tbody>
+        </table>
+
+        <h3>Request Medical Resources</h3>
+        <input type="text" id="itemName" placeholder="Item Name" required>
+        <input type="number" id="quantity" placeholder="Quantity" required>
+        <button class="request" onclick="submitRequest()">Submit Request</button>
     </div>
-    <div>
-        <h2>Submit Resource Request</h2>
-        <form action="/submitResourceRequest" method="post">
-            <label for="item_name">Item Name:</label>
-            <input type="text" id="item_name" name="item_name">
-            <br>
-            <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" name="quantity">
-            <br>
-            <label for="requester">Requester:</label>
-            <input type="text" id="requester" name="requester">
-            <br>
-            <button type="submit">Submit</button>
-        </form>
-    </div>
+
+    <script>
+        function loadInventory() {
+            fetch("https://your-azure-functions-url/api/getInventory")
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById("inventoryTable");
+                tableBody.innerHTML = "";
+                data.forEach(item => {
+                    tableBody.innerHTML += `<tr>
+                        <td>${item.item_name}</td>
+                        <td>${item.quantity}</td>
+                    </tr>`;
+                });
+            })
+            .catch(error => console.error("Error loading inventory:", error));
+        }
+        loadInventory();
+
+        function submitRequest() {
+            const itemName = document.getElementById("itemName").value;
+            const quantity = document.getElementById("quantity").value;
+            
+            if (!itemName || !quantity) {
+                alert("Please fill in all fields.");
+                return;
+            }
+            
+            fetch("https://your-azure-functions-url/api/submitResourceRequest", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ itemName, quantity, requester: "PHC" })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Resource request submitted successfully.");
+                    loadInventory();
+                } else {
+                    alert("Failed to submit request.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Submission failed.");
+            });
+        }
+    </script>
 </body>
 </html>

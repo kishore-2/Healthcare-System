@@ -8,8 +8,7 @@
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",
-    "bcrypt": "^5.1.1",
-    "mssql": "^11.0.1"
+    "dotenv": "^16.4.7"
   },
   "main": "src/{index.js,functions/*.js}"
 }

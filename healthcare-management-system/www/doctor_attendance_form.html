@@ -4,24 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctor Attendance Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
-    <h1>Doctor Attendance Form</h1>
-    <form action="/submitAttendance" method="post">
-        <label for="doctor_id">Doctor ID:</label>
-        <input type="text" id="doctor_id" name="doctor_id">
-        <br>
-        <label for="doctor_name">Doctor Name:</label>
-        <input type="text" id="doctor_name" name="doctor_name">
-        <br>
-        <label for="status">Status:</label>
-        <select id="status" name="status">
+    <div class="container">
+        <h2>Doctor Attendance Form</h2>
+        <input type="text" id="doctorName" placeholder="Doctor Name" required>
+        <input type="text" id="doctorId" placeholder="Doctor ID" required>
+        <select id="status">
+            <option value="">Select Status</option>
             <option value="P">Present</option>
             <option value="AB">Absent</option>
             <option value="A">Available</option>
         </select>
-        <br>
-        <button type="submit">Submit</button>
-    </form>
+        <button onclick="submitAttendance()">Submit Attendance</button>
+    </div>
+
+    <script>
+        const API_URL = "https://your-azure-functions-url/api/submitDoctorAttendance"; // Replace with actual Azure Function URL
+
+        async function submitAttendance() {
+            const doctorName = document.getElementById("doctorName").value.trim();
+            const doctorId = document.getElementById("doctorId").value.trim();
+            const status = document.getElementById("status").value;
+
+            if (!doctorName || !doctorId || !status) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ doctorName, doctorId, status })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert("Attendance submitted successfully.");
+                    document.getElementById("doctorName").value = "";
+                    document.getElementById("doctorId").value = "";
+                    document.getElementById("status").value = "";
+                } else {
+                    alert(data.message || "Failed to submit attendance.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Submission failed. Please try again.");
+            }
+        }
+    </script>
 </body>
 </html>

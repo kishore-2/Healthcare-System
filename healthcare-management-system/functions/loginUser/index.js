@@ -1,3 +1,4 @@
+require('dotenv').config();
 const sql = require('mssql');
 const bcrypt = require('bcrypt');
 
@@ -14,7 +15,7 @@ module.exports = async function (context, req) {
 
     try {
         await sql.connect(process.env.AzureSqlConnection);
-        const result = await sql.query`SELECT * FROM Users WHERE Username = ${username} AND Role = ${role}`;
+        const result = await sql.query`SELECT * FROM Users WHERE username = ${username} AND role = ${role}`;
 
         if (result.recordset.length === 0) {
             context.res = {
@@ -25,7 +26,7 @@ module.exports = async function (context, req) {
         }
 
         const user = result.recordset[0];
-        const passwordMatch = await bcrypt.compare(password, user.PasswordHash);
+        const passwordMatch = await bcrypt.compare(password, user.password_hash);
 
         if (!passwordMatch) {
             context.res = {
@@ -37,10 +38,9 @@ module.exports = async function (context, req) {
 
         context.res = {
             status: 200,
-            body: { message: "Authentication successful." }
+            body: { message: "Authentication successful.", role: user.role }
         };
     } catch (err) {
-        context.log.error('Error authenticating user:', err);
         context.res = {
             status: 500,
             body: { message: "Error authenticating user: " + err.message }

@@ -4,16 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DDHS Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1000px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #28a745;
+            color: white;
+        }
+        select, button, a {
+            padding: 8px;
+            margin-bottom: 10px;
+            text-decoration: none;
+        }
+        .approve { background-color: #28a745; color: white; }
+        .approve:hover { background-color: #218838; }
+        .reject { background-color: #dc3545; color: white; }
+        .reject:hover { background-color: #c82333; }
+        .nav { margin-bottom: 20px; }
+        .nav a {
+            margin-right: 15px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+        .nav a:hover { background-color: #0056b3; }
+    </style>
 </head>
 <body>
-    <h1>DDHS Dashboard</h1>
-    <div>
-        <h2>Doctor Attendance</h2>
-        <div id="attendance"></div>
+    <div class="container">
+        <h2>DDHS Dashboard</h2>
+        
+        <div class="nav">
+            <a href="doctor_attendance_form.html">Doctor Attendance Form</a>
+            <a href="index.html">Logout</a>
+        </div>
+        
+        <h3>Doctor Attendance</h3>
+        <label for="statusFilter">Filter by Status:</label>
+        <select id="statusFilter">
+            <option value="">All</option>
+            <option value="P">Present</option>
+            <option value="AB">Absent</option>
+            <option value="A">Available</option>
+        </select>
+        <table>
+            <thead>
+                <tr>
+                    <th>Doctor Name</th>
+                    <th>Doctor ID</th>
+                    <th>Status</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceTable"></tbody>
+        </table>
+        
+        <h3>Approval System - Pending Requests</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Requester</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="requestTable"></tbody>
+        </table>
     </div>
-    <div>
-        <h2>Resource Requests</h2>
-        <div id="requests"></div>
-    </div>
+
+    <script>
+        const API_BASE_URL = "https://your-azure-functions-url/api"; // Replace with your actual Azure Functions URL
+
+        async function fetchDoctorAttendance(filterStatus = "") {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getDoctorAttendance`);
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.message || "Failed to fetch attendance data");
+
+                const tableBody = document.getElementById("attendanceTable");
+                tableBody.innerHTML = "";
+
+                const filteredData = filterStatus ? data.filter(record => record.status === filterStatus) : data;
+                
+                filteredData.forEach(record => {
+                    tableBody.innerHTML += `<tr>
+                        <td>${record.doctor_name}</td>
+                        <td>${record.doctor_id}</td>
+                        <td>${record.status}</td>
+                        <td>${new Date(record.timestamp).toLocaleString()}</td>
+                    </tr>`;
+                });
+            } catch (error) {
+                console.error("Error fetching doctor attendance:", error);
+            }
+        }
+
+        document.getElementById("statusFilter").addEventListener("change", function() {
+            fetchDoctorAttendance(this.value);
+        });
+
+        async function fetchResourceRequests() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getResourceRequests`);
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.message || "Failed to fetch requests");
+
+                const tableBody = document.getElementById("requestTable");
+                tableBody.innerHTML = "";
+
+                data.forEach(request => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${request.item_name}</td>
+                            <td>${request.quantity}</td>
+                            <td>${request.requester}</td>
+                            <td id="status-${request.request_id}">${request.status}</td>
+                            <td>
+                                <button class="approve" onclick="updateRequestStatus(${request.request_id}, 'Approved')">Approve</button>
+                                <button class="reject" onclick="updateRequestStatus(${request.request_id}, 'Rejected')">Reject</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error fetching resource requests:", error);
+            }
+        }
+
+        async function updateRequestStatus(requestId, newStatus) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/approveResourceRequest`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ request_id: requestId, status: newStatus })
+                });
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message || "Failed to update request");
+
+                document.getElementById(`status-${requestId}`).textContent = newStatus;
+            } catch (error) {
+                console.error("Error updating request status:", error);
+            }
+        }
+
+        // Load data when the page loads
+        fetchDoctorAttendance();
+        fetchResourceRequests();
+    </script>
 </body>
 </html>

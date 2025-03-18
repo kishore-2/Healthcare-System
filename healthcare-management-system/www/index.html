@@ -3,62 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Healthcare Management System</title>
-    <script>
-        async function login(event) {
-            event.preventDefault();
-            const role = document.getElementById('role').value;
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            try {
-                const response = await fetch('/api/authenticate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password, role })
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Error response:', errorText);
-                    alert('Login failed: ' + errorText);
-                    return;
-                }
-
-                const result = await response.json();
-                if (role === 'DDHS') {
-                    window.location.href = 'ddhs_dashboard.html';
-                } else if (role === 'PHC') {
-                    window.location.href = 'phc_subcenter_dashboard.html';
-                } else if (role === 'Sub-Center') {
-                    window.location.href = 'subcenter_dashboard.html';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred: ' + error.message);
-            }
+    <title>Healthcare Management System - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-    </script>
+        .container {
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Login</h1>
-    <form onsubmit="login(event)">
-        <label for="role">Role:</label>
-        <select id="role" name="role">
+    <div class="container">
+        <h2>Login</h2>
+        <p>Select your role and enter your credentials.</p>
+        <select id="role">
+            <option value="">Select Role</option>
             <option value="DDHS">DDHS</option>
             <option value="PHC">PHC</option>
             <option value="Sub-Center">Sub-Center</option>
         </select>
-        <br>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username">
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" autocomplete="current-password">
-        <br>
-        <button type="submit">Login</button>
-    </form>
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button onclick="login()">Login</button>
+    </div>
+
+    <script>
+        const API_URL = "https://your-azure-functions-url/api/loginUser"; // Replace with actual Azure Function URL
+        
+        async function login() {
+            const role = document.getElementById("role").value;
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+            
+            if (!role || !username || !password) {
+                alert("Please fill in all fields.");
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password, role })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const redirectUrl = role === "DDHS" ? "ddhs_dashboard.html" : "phc_subcenter_dashboard.html";
+                    window.location.href = redirectUrl;
+                } else {
+                    alert(data.message || "Invalid credentials. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Authentication failed. Please try again.");
+            }
+        }
+    </script>
 </body>
 </html>
