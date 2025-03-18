@@ -81,7 +81,7 @@
 
     <script>
         function loadInventory() {
-            fetch("https://your-azure-functions-url/api/getInventory")
+            fetch("https://healthcare-function.azurewebsites.net/api/getInventory")
             .then(response => response.json())
             .then(data => {
                 const tableBody = document.getElementById("inventoryTable");
@@ -106,7 +106,7 @@
                 return;
             }
             
-            fetch("https://your-azure-functions-url/api/submitResourceRequest", {
+            fetch("https://healthcare-function.azurewebsites.net/api/submitResourceRequest", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ itemName, quantity, requester: "PHC" })
