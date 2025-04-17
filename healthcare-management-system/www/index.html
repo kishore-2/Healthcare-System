@@ -46,39 +46,42 @@
     <div class="container">
         <h2>Login</h2>
         <p>Select your role and enter your credentials.</p>
-        <select id="role">
-            <option value="">Select Role</option>
-            <option value="DDHS">DDHS</option>
-            <option value="PHC">PHC</option>
-            <option value="Sub-Center">Sub-Center</option>
-        </select>
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button onclick="login()">Login</button>
+        <form onsubmit="login(event)">
+            <select id="role" required>
+                <option value="">Select Role</option>
+                <option value="DDHS">DDHS</option>
+                <option value="PHC">PHC</option>
+                <option value="Sub-Center">Sub-Center</option>
+            </select>
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
     </div>
 
     <script>
         const API_URL = "https://healthcare-function.azurewebsites.net/api/loginUser";
-        
-        async function login() {
+
+        async function login(event) {
+            event.preventDefault(); // Prevent form submission
             const role = document.getElementById("role").value;
             const username = document.getElementById("username").value.trim();
             const password = document.getElementById("password").value.trim();
-            
+
             if (!role || !username || !password) {
                 alert("Please fill in all fields.");
                 return;
             }
-            
+
             try {
                 const response = await fetch(API_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ username, password, role })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     const redirectUrl = role === "DDHS" ? "ddhs_dashboard.html" : "phc_subcenter_dashboard.html";
                     window.location.href = redirectUrl;

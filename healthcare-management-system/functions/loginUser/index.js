@@ -8,7 +8,6 @@ module.exports = async function (context, req) {
     if (!username || !password || !role) {
         context.res = {
             status: 400,
-            headers: { "Access-Control-Allow-Origin": "*" },  // ✅ Fix CORS
             body: { message: "Please provide username, password, and role." }
         };
         return;
@@ -21,36 +20,30 @@ module.exports = async function (context, req) {
         if (result.recordset.length === 0) {
             context.res = {
                 status: 401,
-                headers: { "Access-Control-Allow-Origin": "*" },  // ✅ Fix CORS
                 body: { message: "Invalid credentials." }
             };
             return;
         }
 
         const user = result.recordset[0];
-
-        // 🔍 If passwords are stored in plain text, remove bcrypt
         const passwordMatch = await bcrypt.compare(password, user.password_hash);
 
         if (!passwordMatch) {
             context.res = {
                 status: 401,
-                headers: { "Access-Control-Allow-Origin": "*" },  // ✅ Fix CORS
-                body: { message: "Invalid password." }
+                body: { message: "Invalid credentials." }
             };
             return;
         }
 
         context.res = {
             status: 200,
-            headers: { "Access-Control-Allow-Origin": "*" },  // ✅ Fix CORS
-            body: { success: true, role, redirectUrl: role === "DDHS" ? "ddhs_dashboard.html" : "phc_subcenter_dashboard.html" }
+            body: { message: "Authentication successful.", role: user.role }
         };
-    } catch (error) {
+    } catch (err) {
         context.res = {
             status: 500,
-            headers: { "Access-Control-Allow-Origin": "*" },  // ✅ Fix CORS
-            body: { message: "Server error: " + error.message }
+            body: { message: "Error authenticating user: " + err.message }
         };
     }
 };
