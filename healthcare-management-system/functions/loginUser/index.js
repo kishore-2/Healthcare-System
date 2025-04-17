@@ -3,47 +3,57 @@ const sql = require('mssql');
 const bcrypt = require('bcrypt');
 
 module.exports = async function (context, req) {
-    const { username, password, role } = req.body;
+  // Enable CORS and JSON content-type
+  context.res = {
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff"
+    }
+  };
 
-    if (!username || !password || !role) {
-        context.res = {
-            status: 400,
-            body: { message: "Please provide username, password, and role." }
-        };
-        return;
+  const { username, password, role } = req.body || {};
+
+  if (!username || !password || !role) {
+    context.res.status = 400;
+    context.res.body = JSON.stringify({ message: "Missing username, password or role." });
+    return;
+  }
+
+  try {
+    await sql.connect(process.env.AzureSqlConnection);
+    const result = await sql.query`
+      SELECT * 
+      FROM Users 
+      WHERE username = ${username} AND role = ${role}
+    `;
+
+    if (!result.recordset.length) {
+      context.res.status = 401;
+      context.res.body = JSON.stringify({ message: "Invalid credentials." });
+      return;
     }
 
-    try {
-        await sql.connect(process.env.AzureSqlConnection);
-        const result = await sql.query`SELECT * FROM Users WHERE username = ${username} AND role = ${role}`;
+    const user = result.recordset[0];
+    const match = await bcrypt.compare(password, user.password_hash);
 
-        if (result.recordset.length === 0) {
-            context.res = {
-                status: 401,
-                body: { message: "Invalid credentials." }
-            };
-            return;
-        }
-
-        const user = result.recordset[0];
-        const passwordMatch = await bcrypt.compare(password, user.password_hash);
-
-        if (!passwordMatch) {
-            context.res = {
-                status: 401,
-                body: { message: "Invalid credentials." }
-            };
-            return;
-        }
-
-        context.res = {
-            status: 200,
-            body: { message: "Authentication successful.", role: user.role }
-        };
-    } catch (err) {
-        context.res = {
-            status: 500,
-            body: { message: "Error authenticating user: " + err.message }
-        };
+    if (!match) {
+      context.res.status = 401;
+      context.res.body = JSON.stringify({ message: "Invalid credentials." });
+      return;
     }
+
+    // Success!
+    context.res.status = 200;
+    context.res.body = JSON.stringify({
+      success: true,
+      role,
+      redirectUrl: role === "DDHS"
+        ? "ddhs_dashboard.html"
+        : "phc_subcenter_dashboard.html"
+    });
+  } catch (err) {
+    context.res.status = 500;
+    context.res.body = JSON.stringify({ message: "Server error", detail: err.message });
+  }
 };
